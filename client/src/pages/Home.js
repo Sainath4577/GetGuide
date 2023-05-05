@@ -1,44 +1,108 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/Navbar";
 import { BiCurrentLocation } from "react-icons/bi";
 import { FaSearchLocation } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
+import Loader from "../components/Loader";
+import Card from "../components/Card";
 function Home() {
-  const [formData, setformData] = useState({
-    location: "",
-  });
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [isloading, setLoading] = useState(false);
-  const [cities, setCities] = useState([]);
   const [events, setEvents] = useState([]);
+  const [isplaces, setPlaces] = useState([]);
   const [currentCity, setCurrentcity] = useState(null);
-  const [destiny, setDestiny] = useState();
-  const handleOnChange = (e) => {
-    const { name, value } = e.target;
-    setformData((prev) => {
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
+
+  // const handleOnChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setformData((prev) => {
+  //     return {
+  //       ...prev,
+  //       [name]: value,
+  //     };
+  //   });
+  // };
+
+  const getCords = async () => {
+    try {
+      const position = await getCurrentLocation();
+      setLatitude(position.coords.latitude);
+      setLongitude(position.coords.longitude);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  useEffect(() => {
+    getCords();
+  }, []);
+  const getTouristPlaces = async () => {
+    try {
+      // const response = await axios.get(
+      //   // "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=13.3182853,77.1359441&radius=100000&types=tourist_attraction&key=AIzaSyCtA_cSETT5UZ6NowGM3wHVowyEbB4_lhg"
+      //   // "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=13.3182853,77.1359441&radius=100000&type=attractions&key=AIzaSyCtA_cSETT5UZ6NowGM3wHVowyEbB4_lhg"
+      //   // "https://nearby-places.p.rapidapi.com/v2/nearby",
+      //   // {
+      //   //   params: {
+      //   //     lat: latitude,
+      //   //     lng: longitude,
+      //   //     type: "tourist attraction",
+      //   //     radius: "10000",
+      //   //   },
+      //   // },
+      //   // {
+      //   //   headers: {
+      //   //     "X-RapidAPI-Key":
+      //   //       "80e62722c7mshe1434d65dc48725p1c5d53jsn40e0dc3ae187",
+      //   //     "X-RapidAPI-Host": "nearby-places.p.rapidapi.com",
+      //   //   },
+      //   // }
+
+      //   "https://nearby-places.p.rapidapi.com/v2/nearby?lat=49.2803703&lng=-123.0413988&type=tourist%20attraction&radius=500'header 'X-RapidAPI-Host: nearby-places.p.rapidapi.com' --header 'X-RapidAPI-Key: 80e62722c7mshe1434d65dc48725p1c5d53jsn40e0dc3ae187"
+      // );
+      const response = await axios.get(
+        "https://nearby-places.p.rapidapi.com/v2/nearby",
+        {
+          params: {
+            lat: latitude,
+            lng: longitude,
+            type: "tourist attraction",
+            radius: "10000",
+          },
+          headers: {
+            "X-RapidAPI-Key":
+              "b5cd4d8c68mshd84424afca69f9fp18d7ecjsn05c91c7c780f",
+            "X-RapidAPI-Host": "nearby-places.p.rapidapi.com",
+          },
+        }
+      );
+      setPlaces(response.data.results);
+      const places = response.data.results.map((place) => ({
+        name: place.name,
+        address: place.vicinity,
+        location: place.geometry.location,
+      }));
+      setPlaces(places);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
   function getCurrentLocation() {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject);
     });
   }
-
-  const getLocation = () => {
-    getCurrentLocation()
-      .then((position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-        getCurrentCity();
-      })
-      .catch((error) => toast.error(error.message));
+  const handleButtonClick = async () => {
+    setLoading(true);
+    try {
+      await getCurrentCity();
+      // console.log(isplaces);
+    } catch (error) {
+      toast.error(error.message);
+    }
+    setLoading(false);
   };
+
   const getCurrentCity = async () => {
     try {
       const res = await axios.get(
@@ -48,14 +112,12 @@ function Home() {
         (component) => component.types.includes("locality")
       );
       setCurrentcity(cityComponent.long_name);
-      console.log(currentCity);
+      await getTouristPlaces();
     } catch (error) {
       console.log(error.message);
     }
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
+
   return (
     <div className="container-fluid " style={{ minHeight: "100vh" }}>
       <NavBar p={1} />
@@ -72,72 +134,55 @@ function Home() {
         </div>
       </div>
       <div className="my-5 p-2 row align-items-center justify-content-center flex-column">
-        <div className="col-md-8 my-5  col-12 d-flex flex-column align-items-center justify-content-center">
-          <div className="w-100 my-4">
-            <h1 className="my-4">Yo, where you at</h1>
-            <form className="col-12" onSubmit={handleSubmit}>
-              <div className="input-group d-flex align-items-center justify-content-center">
-                <div className="input-group-prepend my-4">
-                  <button
-                    type="button"
-                    className="btn btn-getLoc"
-                    onClick={() => getLocation()}
-                    style={{
-                      outline: "none",
-                      backgroundColor: "#fff",
-                      padding: "1rem",
-                      borderRadius: "30px 0 0 30px",
-                      border: "1px solid #b9d7ea",
-                    }}
-                  >
-                    <BiCurrentLocation className="icon" />
-                  </button>
-                </div>
+        <div className="col-md-10 my-5  col-12 d-flex flex-column align-items-center justify-content-center">
+          <div className="w-100 my-4 d-flex flex-column align-items-center justify-content-center">
+            <h1 className="my-4 align-self-start">Yo, where you at</h1>
 
-                <input
-                  type="text"
-                  className="form-control "
-                  placeholder="Enter your location (e.g. Tumkur)"
-                  onChange={handleOnChange}
-                  name="location"
-                  id="auto-address"
-                  style={{
-                    outline: "none",
-                    backgroundColor: "#fff",
-                    padding: "1rem",
-                    border: "1px solid #b9d7ea",
-                  }}
-                />
+            <button
+              type="button"
+              className="btn"
+              onClick={(e) => handleButtonClick(e)}
+              style={{
+                outline: "none",
+                backgroundColor: "#fff",
+                padding: "1rem 1.5rem",
+                borderRadius: "20px",
+                border: "1px solid #b9d7ea",
+              }}
+            >
+              {!isloading ? (
+                "Get Current Location"
+              ) : (
+                <Loader color={"#769fcd"} />
+              )}
 
-                <div className="input-group-append">
-                  <button
-                    className="btn"
-                    type="submit"
-                    style={{
-                      outline: "none",
-                      backgroundColor: "#b9d7ea",
-                      padding: "1rem",
-                      borderRadius: "0 30px 30px 0",
-                    }}
-                  >
-                    Search
-                    {/* <FaSearchLocation className="icon mx-1" /> */}
-                  </button>
-                </div>
-              </div>
-            </form>
+              <BiCurrentLocation className="icon" />
+            </button>
           </div>
           {currentCity && (
             <div className="w-100 my-4">
-              <h2 className="my-4">
-                Things to do in
-                <h1 className="my-4 text-capitalize">{currentCity}</h1>
-              </h2>
+              <h2 className="my-4">Things to do in</h2>
+              <h1 className="my-4 text-capitalize">{currentCity}</h1>
             </div>
           )}
           {currentCity && (
             <div className="w-100 my-4">
               <h2 className="my-4">Available activities</h2>
+            </div>
+          )}
+
+          {currentCity && (
+            <div className="w-100 my-4">
+              <h2 className="my-4">Places in </h2>
+              <h1 className="my-4 text-capitalize">{currentCity}</h1>
+              <div
+                className="row align-items-center justify-content-center flex-wrap"
+                style={{ gap: "1.5rem" }}
+              >
+                {isplaces.map((item, index) => (
+                  <Card key={index} name={item.name} address={item.address} />
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -75,16 +75,7 @@ h2 {
   color: var(--blue);
   font-size: 1.5rem;
 }
-.input-group-prepend::before {
-  content: "↙ Detect current location";
-  font-family: "La Belle Aurore", cursive;
-  color: var(--blue);
-  position: absolute;
-  margin-top: -1.5rem;
-  font-size: 1.2rem;
-  left: 4%;
-  z-index: 998;
-}
+
 nav {
   background-color: var(--white);
 }
@@ -94,7 +85,10 @@ ul li {
   padding: 0;
   margin-bottom: 0.5rem;
 }
-
+.card {
+  background-color: var(--prim-white);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
 nav ul {
   margin: 1rem 0;
 }
