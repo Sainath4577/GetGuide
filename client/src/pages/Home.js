@@ -39,7 +39,7 @@ function Home() {
   const getTouristPlaces = async () => {
     try {
       // const response = await axios.get(
-      //   // "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=13.3182853,77.1359441&radius=100000&types=tourist_attraction&key=AIzaSyCtA_cSETT5UZ6NowGM3wHVowyEbB4_lhg"
+      // "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=13.3182853,77.1359441&radius=100000&types=tourist_attraction&key=AIzaSyCtA_cSETT5UZ6NowGM3wHVowyEbB4_lhg"
       //   // "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=13.3182853,77.1359441&radius=100000&type=attractions&key=AIzaSyCtA_cSETT5UZ6NowGM3wHVowyEbB4_lhg"
       //   // "https://nearby-places.p.rapidapi.com/v2/nearby",
       //   // {
@@ -62,6 +62,7 @@ function Home() {
       // );
       const response = await axios.get(
         "https://nearby-places.p.rapidapi.com/v2/nearby",
+
         {
           params: {
             lat: latitude,
@@ -71,11 +72,12 @@ function Home() {
           },
           headers: {
             "X-RapidAPI-Key":
-              "b5cd4d8c68mshd84424afca69f9fp18d7ecjsn05c91c7c780f",
+              "9b3739f5b2msh44d5ca7e998f6d3p142b36jsn44eee64a31ee",
             "X-RapidAPI-Host": "nearby-places.p.rapidapi.com",
           },
         }
       );
+
       setPlaces(response.data.results);
       const places = response.data.results.map((place) => ({
         name: place.name,
@@ -180,7 +182,12 @@ function Home() {
                 style={{ gap: "1.5rem" }}
               >
                 {isplaces.map((item, index) => (
-                  <Card key={index} name={item.name} address={item.address} />
+                  <Card
+                    key={index}
+                    name={item.name}
+                    address={item.address}
+                    loc={item.location}
+                  />
                 ))}
               </div>
             </div>

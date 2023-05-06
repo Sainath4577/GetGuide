@@ -75,7 +75,27 @@ function Register() {
         <div className="card col-md-4 col-11 my-2 p-3 d-flex flex-column align-items-center justify-content-center">
           <form onSubmit={handleSubmit} className="m-2 p-1 w-100">
             <h2 className="text-left m-1 mb-4">Sign up</h2>
-
+            <select
+              className="form-select form-select-lg mb-3"
+              id="select-input"
+              value={formData.role}
+              name="role"
+              onChange={handleOnChange}
+              required
+              style={{
+                borderRadius: "10px",
+                outline: "none",
+                backgroundColor: "#f7f7f7",
+                border: "none",
+              }}
+            >
+              <option value="" selected>
+                {" "}
+                Sign up as
+              </option>
+              <option value="0">User</option>
+              <option value="1">Guide</option>
+            </select>
             <input
               type="text"
               className="form-control  my-3 py-3"

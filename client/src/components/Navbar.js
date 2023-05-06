@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { MdLogout } from "react-icons/md";
 import { HiOutlineMenuAlt4, HiOutlineChevronRight } from "react-icons/hi";
+import { AuthContext } from "../context/AuthContext";
 function NavBar(props) {
+  const { user, dispatch } = useContext(AuthContext);
   const [isNav, setNav] = useState(false);
   return (
     <>
@@ -84,20 +87,7 @@ function NavBar(props) {
                   </h1>
                 </Link>
               </li>
-              {/* <li>
-                <Link to={"/login"}>
-                  <h1 style={{ color: props.p === 2 ? "#b9d7ea" : "#769fcd" }}>
-                    Skills
-                  </h1>
-                </Link>
-              </li> */}
-              {/* <li>
-                <Link to={"/works"}>
-                  <h1 style={{ color: props.p === 3 ? "#b9d7ea" : "#769fcd" }}>
-                    Works
-                  </h1>
-                </Link>
-              </li> */}
+
               <li>
                 <Link to={"/about"}>
                   <h1 style={{ color: props.p === 4 ? "#b9d7ea" : "#769fcd" }}>
@@ -112,6 +102,28 @@ function NavBar(props) {
                   </h1>
                 </Link>
               </li>
+              {!user ? (
+                <li>
+                  <Link to={"/login"}>
+                    <h1
+                      style={{ color: props.p === 4 ? "#b9d7ea" : "#769fcd" }}
+                    >
+                      Sign in
+                    </h1>
+                  </Link>
+                </li>
+              ) : (
+                <li>
+                  <Link
+                    onClick={() => {
+                      localStorage.clear();
+                      dispatch({ type: "LOGOUT_SUCCESS", payload: null });
+                    }}
+                  >
+                    Sign out
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>
